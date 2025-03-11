@@ -1,3 +1,102 @@
+
+🔑 STEP 1: CHANGE PASSWORDS & REMOVE UNNECESSARY ACCOUNTS
+🔹 Attackers will try default credentials. Fix this ASAP!
+
+1️⃣ Rename & Change Administrator Password
+powershell
+Copy
+Edit
+Rename-LocalUser -Name "Administrator" -NewName "ServerAdmin"
+Set-LocalUser -Name "ServerAdmin" -Password (ConvertTo-SecureString "SuperStrongPassword123!" -AsPlainText -Force)
+2️⃣ Remove Guest & Other Default Accounts
+powershell
+Copy
+Edit
+Remove-LocalUser -Name "Guest" -ErrorAction SilentlyContinue
+Remove-LocalUser -Name "DefaultAccount" -ErrorAction SilentlyContinue
+3️⃣ Check for Suspicious Users & Remove Them
+powershell
+Copy
+Edit
+Get-LocalUser
+Remove-LocalUser -Name "Hacker" -ErrorAction SilentlyContinue
+4️⃣ Force Log Off All Other Users
+powershell
+Copy
+Edit
+query session
+logoff 2  # Replace '2' with unwanted user session ID
+✅ This kicks out any attackers who got in!
+
+🔒 STEP 2: SECURE IIS & WEBSITE FILES
+Attackers will try to modify website files. Prevent this!
+
+1️⃣ Disable Directory Browsing (Prevents File Snooping)
+powershell
+Copy
+Edit
+Import-Module WebAdministration
+Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter 'system.webServer/directoryBrowse' -name enabled -value false
+2️⃣ Restrict IIS File Permissions
+powershell
+Copy
+Edit
+icacls "C:\inetpub\wwwroot" /inheritance:r /grant IIS_IUSRS:(RX)
+icacls "C:\inetpub\wwwroot" /remove Everyone
+3️⃣ Disable WebDAV & FTP (Common Exploits)
+powershell
+Copy
+Edit
+Uninstall-WindowsFeature -Name Web-Ftp-Server -ErrorAction SilentlyContinue
+Uninstall-WindowsFeature -Name Web-WebDAV-Publishing -ErrorAction SilentlyContinue
+4️⃣ Remove Unused IIS Modules
+powershell
+Copy
+Edit
+Remove-WebFeature -Name Web-DAV-Publishing
+Remove-WebFeature -Name Web-Ftp-Server
+✅ These steps prevent file modifications & directory exploits.
+
+🛡 STEP 3: FIREWALL – BLOCK UNWANTED ACCESS
+Attackers will try to remotely access your system. Stop them!
+
+1️⃣ Allow Only HTTP/HTTPS Traffic
+powershell
+Copy
+Edit
+New-NetFirewallRule -DisplayName "Allow HTTP" -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+New-NetFirewallRule -DisplayName "Allow HTTPS" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow
+New-NetFirewallRule -DisplayName "Block Everything Else" -Direction Inbound -Action Block
+2️⃣ Block RDP (If Not Needed)
+powershell
+Copy
+Edit
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 1
+3️⃣ Block SMB (Prevents EternalBlue Exploit)
+powershell
+Copy
+Edit
+Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force
+Set-SmbServerConfiguration -EnableSMB2Protocol $false -Force
+✅ Stops attackers from remotely accessing your system.
+
+📡 STEP 4: MONITOR FOR ATTACKS
+Catch attackers BEFORE they shut down IIS!
+
+1️⃣ Watch for Failed Login Attempts
+powershell
+Copy
+Edit
+Get-EventLog -LogName Security -Newest 20 | Where-Object { $_.EventID -eq 4625 }
+2️⃣ Monitor IIS Logs for Suspicious Requests
+powershell
+Copy
+Edit
+Get-Content "C:\inetpub\logs\LogFiles\W3SVC1\u_ex*.log" -Wait
+
+
+
+
 # cyber-defense
 
 🛑 STEP 1: REMOVE DEFAULT USERS & CHANGE PASSWORDS
