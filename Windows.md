@@ -1,4 +1,10 @@
-
+$services = @("wampapache64", "wampmysqld64")
+foreach ($service in $services) {
+    if ((Get-Service $service).Status -ne 'Running') {
+        Start-Service $service
+        Write-Host "🚀 Restarted $service"
+    }
+}
 🔑 STEP 1: CHANGE PASSWORDS & REMOVE UNNECESSARY ACCOUNTS
 🔹 Attackers will try default credentials. Fix this ASAP!
 
