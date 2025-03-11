@@ -10,7 +10,7 @@ Set-LocalUser -Name "ServerAdmin" -Password (ConvertTo-SecureString "SuperStrong
 
 This makes it harder for them to brute-force your admin account.
 -----------------------------
-**Remove Guest & Other Default Users**
+-**Remove Guest & Other Default Users**
 
 Powershell
 
@@ -19,7 +19,7 @@ Remove-LocalUser -Name "DefaultAccount"
 Check for Any Suspicious Users
 
 -----------------------------
-**Check for Any Suspicious Users**
+-**Check for Any Suspicious Users**
 powershell
 
 Get-LocalUser
